@@ -20,7 +20,7 @@ on:
 jobs:
   rdp-job:
     runs-on: windows-latest
-    timeout-minutes: ${{ format('{0}', (inputs.duration_hours | int) * 60 + 10) }}
+    timeout-minutes: ${{ (inputs.duration_hours == '24' && 1440) || (inputs.duration_hours == '12' && 720) || (inputs.duration_hours == '8' && 480) || (inputs.duration_hours == '6' && 360) || (inputs.duration_hours == '4' && 240) || (inputs.duration_hours == '2' && 120) || 60 }}
 
     steps:
       - name: Enable RDP
@@ -52,11 +52,7 @@ jobs:
 
       - name: Countdown Timer
         run: |
-          $hours = ${{
-            if (inputs.duration_hours == '24') { '23' }
-            else { inputs.duration_hours }
-          }}
-          $endTime = (Get-Date).AddHours($hours | int)
+          $endTime = (Get-Date).AddMinutes(${{ (inputs.duration_hours == '24' && 1380) || (inputs.duration_hours == '12' && 660) || (inputs.duration_hours == '8' && 420) || (inputs.duration_hours == '6' && 300) || (inputs.duration_hours == '4' && 180) || (inputs.duration_hours == '2' && 60) || 0 }})
           while ((Get-Date) -lt $endTime) {
             $remaining = ($endTime - (Get-Date)).ToString("hh\jam\m\e\n\i\t\e\s\s\ \d\a\l\a\m")
             Write-Host "[$(Get-Date -Format 'HH:mm:ss')] RDP aktif sisa waktu: $remaining"
